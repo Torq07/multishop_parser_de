@@ -63,13 +63,37 @@ class Vandenborre
 		get_item_links
 	end
 
+	def parse_brands
+		brands=page.css('div.info_merk.info ul li label').map{|a| a.text.strip.downcase }
+		brands.shift
+		brands+=["fresh ´n rebel","silk´n","vogel´s"]
+	end
+
+	def split_brand_and_number(brands,product_name)
+		result=nil
+		brands.each do |brand| 
+			if product_name.include?(brand)
+				return [brand, product_name.partition(brand)[2]]
+			else	
+				array=product_name.split
+				result||=[ array.shift, array.join(' ')] 
+			end	
+		end	
+		result
+	end
+
 	def get_item_links
 		categories_links.each do |link|
-			puts link
 			load_page(link)
+			brands=parse_brands
+			puts link
 			page.css('li.productline.Normal div.product').each do |product|
-			 item_links<<[product.css('div.prod_naam h2 a').text,
-									  product.css('div.prijs strong').text]
+				product_name=product.css('div.prod_naam h2 a').text.downcase
+				properties=split_brand_and_number(brands,product_name)
+				item_links<<[properties[0].capitalize,
+										 properties[1].upcase,
+										 product.css('div.prijs strong').text]
+
 			end																								 
 		end	
 		item_links
