@@ -1,10 +1,9 @@
-require 'nokogiri'
-require 'open-uri'
+require_relative 'website'
 
-class Vandenborre
+class Vandenborre < Website
 
-	attr_reader :endpoint, :categories_links, :item_links, :exceptions	
-	attr_accessor :page
+	attr_reader :endpoint
+	attr_accessor :page,:categories_links, :item_links, :exceptions, :brands
 
 	ENDPOINT='http://www.vandenborre.be/'
 
@@ -45,11 +44,6 @@ class Vandenborre
 								]
 	end
 	
-	def load_page(address)
-	  url=URI(address)
-		@page=Nokogiri::HTML.parse(open(url))	
-	end
-
 	def get_categories_links
 		load_page(ENDPOINT)
 		page.css('div.grid_2.univLinkBlock.alpha h3 a').each do |a|
@@ -64,22 +58,9 @@ class Vandenborre
 	end
 
 	def parse_brands
-		brands=page.css('div.info_merk.info ul li label').map{|a| a.text.strip.downcase }
-		brands.shift
-		brands+=["fresh ´n rebel","silk´n","vogel´s"]
-	end
-
-	def split_brand_and_number(brands,product_name)
-		result=nil
-		brands.each do |brand| 
-			if product_name.include?(brand)
-				return [brand, product_name.partition(brand)[2]]
-			else	
-				array=product_name.split
-				result||=[ array.shift, array.join(' ')] 
-			end	
-		end	
-		result
+		@brands=page.css('div.info_merk.info ul li label').map{|a| a.text.strip.downcase }
+		@brands.shift
+		@brands+=["fresh ´n rebel","silk´n","vogel´s"]
 	end
 
 	def get_item_links
@@ -89,7 +70,7 @@ class Vandenborre
 			puts link
 			page.css('li.productline.Normal div.product').each do |product|
 				product_name=product.css('div.prod_naam h2 a').text.downcase
-				properties=split_brand_and_number(brands,product_name)
+				properties=split_name(product_name)
 				item_links<<[properties[0].capitalize,
 										 properties[1].upcase,
 										 product.css('div.prijs strong').text]

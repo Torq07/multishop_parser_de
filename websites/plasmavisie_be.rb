@@ -1,7 +1,7 @@
-require 'nokogiri'
-require 'open-uri'
 
-class Plasmavisie
+require_relative 'website'
+
+class Plasmavisie < Website
 
 	attr_reader :endpoint
 	attr_accessor :page,:categories_links,:item_links, :brands
@@ -11,11 +11,6 @@ class Plasmavisie
 	def initialize
 		@categories_links=[]
 		@item_links=[]
-	end
-	
-	def load_page(address)
-	  url=URI(address)
-		@page=Nokogiri::HTML.parse(open(url))	
 	end
 
 	def get_categories_links
@@ -30,21 +25,9 @@ class Plasmavisie
 	end
 
 	def parse_brands
-		@brands=page.at('dt:contains("Merk")').next.css('li a').map(&:text)
-	end
 
-	def split_name(name)
-		result=nil
-		brands.each do |brand| 
-			if name.include?(brand)
-				return [brand, name.partition(brand)[2]]
-			else	
-				array=name.split
-				result||=[ array.shift, array.join(' ')] 
-			end	
-		end	
-		result
-	end		
+		@brands=page.at('dt:contains("Merk")').next.css('li a').map(&:text)	
+	end
 
 	def get_item_links
 		categories_links.each do |category|

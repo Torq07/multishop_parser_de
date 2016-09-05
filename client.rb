@@ -13,7 +13,7 @@ shops.each do |shop|
 		#{shop}_items=#{shop}_shop.get_categories_links
 		Axlsx::Package.new do |p|
 			p.workbook.add_worksheet(:name => "#{shop}") do |sheet|
-				sheet.add_row ["Product name",'Price']
+				sheet.add_row ['Brand','Ref number','Price']
 				#{shop}_items.each {|record| sheet.add_row record}
 			end
 			p.serialize("#{shop}.xlsx")
@@ -23,6 +23,7 @@ shops.each do |shop|
 end	
 gmail.deliver do
 		to "torq07@gmail.com"
+		# to "nicolas.sonck@electrostock.be"
 		subject "Update for #{Time.now}"
 		text_part do
 			body "Update is attached"
