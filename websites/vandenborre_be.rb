@@ -5,7 +5,7 @@ class Vandenborre < Website
 	attr_reader :endpoint
 	attr_accessor :page,:categories_links, :item_links, :exceptions, :brands
 
-	ENDPOINT='http://www.vandenborre.be/'
+	ENDPOINT='http://www.vandenborre.be'
 
 	def initialize
 		@categories_links=[]

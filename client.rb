@@ -1,11 +1,12 @@
 require_relative 'websites/vandenborre_be'
 require_relative 'websites/plasmavisie_be'
+require_relative 'websites/kieskeurig_be'
 require 'axlsx'
 require 'gmail'
 
 gmail = Gmail.connect('updatesenderbot@gmail.com', 'Cat12345')
 
-shops=['vandenborre','plasmavisie']
+shops=['vandenborre','plasmavisie','kieskeurig']
 shops.each do |shop|
 	p shop
 	code=%Q{

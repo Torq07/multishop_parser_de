@@ -40,7 +40,6 @@ class Plasmavisie < Website
 				page.css('div.category-products ul.products-grid li.item').each do |item| 
 					properties=split_name(item.css('h2.product-name a').text)
 					properties<<item.css('div.price-box p.special-price span.price').first.text.strip
-					properties
 					item_links<<properties
 				end	
 				index+=1
