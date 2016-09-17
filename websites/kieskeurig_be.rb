@@ -3,13 +3,13 @@ require_relative 'website'
 class Kieskeurig < Website
 
 	attr_reader :endpoint
-	attr_accessor :page,:categories_links, :item_links, :exceptions, :brands
+	attr_accessor :page,:categories_links, :item_data, :exceptions, :brands
 
 	ENDPOINT='http://www.kieskeurig.be'
 
 	def initialize
 		@categories_links=[]
-		@item_links=[]
+		@item_data=[]
 		@exceptions=['mobiel','computers',
 								 'fiets','gaming',
 								 'baby_en_peuter','sport',
@@ -17,20 +17,20 @@ class Kieskeurig < Website
 								 'koffer_en_reistas','dvd',
 								 'fornuis','stoel',
 								 'verlichting','bouw_en_constructiespeelgoed',
-								 'pan','domotica','accessoires']
+								 'pan','domotica','accessoires','Parfums']
 	end
-	
-	def get_categories_links
+
+	def parse_data
 		load_page(ENDPOINT)
 		@categories_links+=['http://www.kieskeurig.be/robotstofzuiger','http://www.kieskeurig.be/thermostaat','http://www.kieskeurig.be/cv-ketel']
 		page.search('div.sub-menu-cntr__menu ul.level-1').each	 do |a|
 					unless exceptions.include?(a.at('a[1]').text.strip.downcase)
 						a.search('ul[class="level-2"] li a').each do |a|
-							@categories_links<<a['href'] if a['href'].include?(ENDPOINT)
-						end	
-					end	
-		end		
-		get_item_links
+							@categories_links<<a['href'] if a['href'].include?(ENDPOINT)&&!exceptions.include?(a.text.strip)
+						end
+					end
+		end
+		get_item_data
 	end
 
 	def parse_brands
@@ -39,7 +39,8 @@ class Kieskeurig < Website
 								.map{|a| a['data-filter-label'] }
 	end
 
-	def get_item_links
+	def get_item_data
+		p categories_links.count
 		categories_links.uniq.each do |link|
 			p link
 			load_page(link)
@@ -52,23 +53,23 @@ class Kieskeurig < Website
 			(1..page_amount).each do |index|
 				begin
 					load_page(link+"?page=#{index}")
-					page.css('article.product-tile.js-product').each do |item| 
+					page.css('article.product-tile.js-product').each do |item|
 						name=split_name(item.css('h2.product-tile__title').text.strip)
 						unless name.nil?
 							properties=name
 							price=item.css('div.product-tile__price strong').text.strip ? item.css('div.product-tile__price strong').text.strip : "No price"
 							puts item.css('h2.product-tile__title').text if properties.nil?
 							properties<<price
-							item_links<<properties
+							item_data<<properties
 						end
-					end	
+					end
 					rescue
 						next
 					end
-			end 
-		end	
-		item_links
-	end	
-		
+			end
+		end
+		item_data
+	end
 
-end	
+
+end

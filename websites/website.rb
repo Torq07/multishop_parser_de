@@ -3,9 +3,9 @@ require 'open-uri'
 
 class Website
 
-	def get_categories_links; end
+	def parse_data; end
 	def parse_brands; end
-	def get_item_links; end
+	def get_item_data; end
 
 	def load_page(address)
 	  url=URI(address)
@@ -14,6 +14,7 @@ class Website
 
 	def split_name(name)
 		result=nil
+		name.downcase!
 		brands.each do |brand| 
 			if name.include?(brand)
 				return [brand, name.partition(brand)[2]]
