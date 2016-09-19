@@ -1,13 +1,11 @@
-require_relative 'websites/vandenborre_be'
-require_relative 'websites/plasmavisie_be'
-require_relative 'websites/kieskeurig_be'
-require_relative 'websites/artencraft_be'
+Dir["./websites/*"].each {|file| require file }
 require 'axlsx'
 require 'gmail'
 
-gmail = Gmail.connect('updatesenderbot@gmail.com', 'Cat12345')
 
-shops=['artencraft','vandenborre','plasmavisie','kieskeurig']
+gmail = Gmail.connect(ENV['sender_email'], ENV['sender_pass'])
+
+shops=['coolblue','vandenborre','plasmavisie','artencraft','kieskeurig']
 shops.each do |shop|
 	p shop
 	code=%Q{
@@ -23,10 +21,10 @@ shops.each do |shop|
 	}
 	eval code
 end	
-gmail.deliver do
-		to "torq07@gmail.com"
-		# to "nicolas.sonck@electrostock.be"
-		subject "Update for #{Time.now}"
+
+ gmail.deliver do
+		to ENV['reciever_email']
+		subject "Update"
 		text_part do
 			body "Update is attached"
 		end
