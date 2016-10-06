@@ -5,7 +5,7 @@ class Kieskeurig < Website
 	attr_reader :endpoint
 	attr_accessor :page,:categories_links, :item_data, :exceptions, :brands
 
-	ENDPOINT='http://www.kieskeurig.be'
+	ENDPOINT='https://www.kieskeurig.be'
 
 	def initialize
 		@categories_links=[]
@@ -22,11 +22,11 @@ class Kieskeurig < Website
 
 	def parse_data
 		load_page(ENDPOINT)
-		@categories_links+=['http://www.kieskeurig.be/robotstofzuiger','http://www.kieskeurig.be/thermostaat','http://www.kieskeurig.be/cv-ketel']
+		@categories_links+=['https://www.kieskeurig.be/robotstofzuiger','https://www.kieskeurig.be/thermostaat','https://www.kieskeurig.be/cv-ketel']
 		page.search('div.sub-menu-cntr__menu ul.level-1').each	 do |a|
 					unless exceptions.include?(a.at('a[1]').text.strip.downcase)
 						a.search('ul[class="level-2"] li a').each do |a|
-							@categories_links<<a['href'] if a['href'].include?(ENDPOINT)&&!exceptions.include?(a.text.strip)
+							@categories_links<<ENDPOINT+a['href'] if !exceptions.include?(a.text.strip)
 						end
 					end
 		end
